@@ -6,19 +6,32 @@
 
 <style>
 body {
-  background: #0d0d0d;
-  color: white;
+  background: #0a0a0a;
   font-family: Arial;
-  text-align: center;
+  color: white;
+  margin: 0;
 }
 
 h1 {
-  margin: 20px;
+  text-align: center;
+  padding: 20px;
 }
 
 .container {
-  max-width: 500px;
+  max-width: 700px;
   margin: auto;
+}
+
+.categoria {
+  margin-top: 30px;
+  background: #111;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.categoria h2 {
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
 }
 
 .item {
@@ -28,55 +41,69 @@ h1 {
   align-items: center;
 }
 
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 button {
   background: #007bff;
   border: none;
-  color: white;
   padding: 5px 10px;
+  color: white;
   cursor: pointer;
 }
 
 .total {
-  margin-top: 20px;
-  font-size: 24px;
+  text-align: center;
+  font-size: 28px;
+  margin: 30px 0;
 }
 </style>
-
 </head>
 
 <body>
 
 <h1>TABELA DA MECÂNICA</h1>
 
-<div class="container" id="lista"></div>
+<div class="container" id="app"></div>
 
 <div class="total">
 TOTAL: R$ <span id="total">0</span>
 </div>
 
 <script>
-const itens = [
-  {nome:"Full Tuning (sem blindagem)", preco:150000},
-  {nome:"Full Tuning (com blindagem)", preco:200000},
-  {nome:"Motor", preco:20000},
-  {nome:"Freios", preco:20000},
-  {nome:"Transmissão", preco:20000},
-  {nome:"Turbo", preco:50000},
-  {nome:"Blindagem", preco:50000},
-  {nome:"Pintura", preco:10000},
-  {nome:"Neon", preco:15000},
-  {nome:"Capô", preco:10000},
-  {nome:"Grelha", preco:10000},
-  {nome:"Aerofólio", preco:10000},
-  {nome:"Parachoque Dianteiro", preco:10000},
-  {nome:"Parachoque Traseiro", preco:10000},
-  {nome:"Saia", preco:10000},
-  {nome:"Vidro", preco:10000},
-  {nome:"Placa", preco:10000},
-  {nome:"Paralama", preco:10000},
-  {nome:"Kit Reparos", preco:10000},
-  {nome:"Pneus", preco:1200}
-];
+const categorias = {
+  "Full Tuning": [
+    {nome:"Sem Blindagem", preco:150000},
+    {nome:"Com Blindagem", preco:200000}
+  ],
+  "Estética": [
+    {nome:"Pintura", preco:10000},
+    {nome:"Neon", preco:15000},
+    {nome:"Capô", preco:10000},
+    {nome:"Grelha", preco:10000},
+    {nome:"Aerofólio", preco:10000},
+    {nome:"Parachoque Dianteiro", preco:10000},
+    {nome:"Parachoque Traseiro", preco:10000},
+    {nome:"Saia", preco:10000},
+    {nome:"Vidro", preco:10000},
+    {nome:"Placa", preco:10000},
+    {nome:"Paralama", preco:10000}
+  ],
+  "Performance": [
+    {nome:"Motor", preco:20000},
+    {nome:"Freios", preco:20000},
+    {nome:"Transmissão", preco:20000},
+    {nome:"Turbo", preco:50000},
+    {nome:"Blindagem", preco:50000}
+  ],
+  "Reparos": [
+    {nome:"Kit Reparos", preco:10000},
+    {nome:"Pneus", preco:1200}
+  ]
+};
 
 let total = 0;
 
@@ -84,53 +111,66 @@ function atualizarTotal(){
   document.getElementById("total").innerText = total.toLocaleString();
 }
 
-const lista = document.getElementById("lista");
+const app = document.getElementById("app");
 
-itens.forEach(item => {
-  let quantidade = 0;
+for (let categoria in categorias) {
+  const divCat = document.createElement("div");
+  divCat.className = "categoria";
 
-  const div = document.createElement("div");
-  div.className = "item";
+  const titulo = document.createElement("h2");
+  titulo.innerText = categoria;
 
-  const nome = document.createElement("span");
-  nome.innerText = item.nome;
+  divCat.appendChild(titulo);
 
-  const controles = document.createElement("div");
+  categorias[categoria].forEach(item => {
+    let qtd = 0;
 
-  const menos = document.createElement("button");
-  menos.innerText = "-";
+    const div = document.createElement("div");
+    div.className = "item";
 
-  const qtd = document.createElement("span");
-  qtd.innerText = "0";
+    const nome = document.createElement("span");
+    nome.innerText = item.nome;
 
-  const mais = document.createElement("button");
-  mais.innerText = "+";
+    const controls = document.createElement("div");
+    controls.className = "controls";
 
-  menos.onclick = () => {
-    if (quantidade > 0) {
-      quantidade--;
-      total -= item.preco;
-      qtd.innerText = quantidade;
+    const menos = document.createElement("button");
+    menos.innerText = "-";
+
+    const num = document.createElement("span");
+    num.innerText = "0";
+
+    const mais = document.createElement("button");
+    mais.innerText = "+";
+
+    menos.onclick = () => {
+      if(qtd > 0){
+        qtd--;
+        total -= item.preco;
+        num.innerText = qtd;
+        atualizarTotal();
+      }
+    };
+
+    mais.onclick = () => {
+      qtd++;
+      total += item.preco;
+      num.innerText = qtd;
       atualizarTotal();
-    }
-  };
+    };
 
-  mais.onclick = () => {
-    quantidade++;
-    total += item.preco;
-    qtd.innerText = quantidade;
-    atualizarTotal();
-  };
+    controls.appendChild(menos);
+    controls.appendChild(num);
+    controls.appendChild(mais);
 
-  controles.appendChild(menos);
-  controles.appendChild(qtd);
-  controles.appendChild(mais);
+    div.appendChild(nome);
+    div.appendChild(controls);
 
-  div.appendChild(nome);
-  div.appendChild(controles);
+    divCat.appendChild(div);
+  });
 
-  lista.appendChild(div);
-});
+  app.appendChild(divCat);
+}
 </script>
 
 </body>
